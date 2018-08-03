@@ -1,29 +1,34 @@
 {
-  "name": "clacks",
-  "version": "1.0.0",
-  "description": "Message broker to propagate objects throught relevant client sessions",
-  "main": "index.js",
-  "dependencies": {
-    "ws": "^6.0.0"
-  },
-  "devDependencies": {
-    "jest": "^23.4.2"
-  },
-  "scripts": {
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/logdyn/clacks.git"
-  },
-  "keywords": [
-    "logdyn",
-    "messaging"
-  ],
-  "author": "logdyn <contact@logdyn.com> (logdyn.com)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/logdyn/clacks/issues"
-  },
-  "homepage": "https://github.com/logdyn/clacks#readme"
+    "name": "clacks",
+    "version": "1.0.0",
+    "description": "Message broker to propagate objects throught relevant client sessions",
+    "main": "index.js",
+    "jest": {
+        "testEnvironment": "node",
+        "collectCoverage": true
+    },
+    "dependencies": {
+        "ws": "^6.0.0"
+    },
+    "devDependencies": {
+        "jest": "^23.4.2",
+        "node-mocks-http": "^1.7.0"
+    },
+    "scripts": {
+        "test": "jest --detectOpenHandles"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/logdyn/clacks.git"
+    },
+    "keywords": [
+        "logdyn",
+        "messaging"
+    ],
+    "author": "logdyn <contact@logdyn.com> (logdyn.com)",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/logdyn/clacks/issues"
+    },
+    "homepage": "https://github.com/logdyn/clacks#readme"
 }
