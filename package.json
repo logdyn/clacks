@@ -1,0 +1,27 @@
+{
+  "name": "clacks",
+  "version": "1.0.0",
+  "description": "Message broker to propagate objects throught relevant client sessions",
+  "main": "index.js",
+  "dependencies": {
+    "ws": "^6.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logdyn/clacks.git"
+  },
+  "keywords": [
+    "logdyn",
+    "messaging"
+  ],
+  "author": "logdyn <contact@logdyn.com> (logdyn.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/logdyn/clacks/issues"
+  },
+  "homepage": "https://github.com/logdyn/clacks#readme"
+}
