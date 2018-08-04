@@ -1,130 +1,144 @@
 let httpMocks = require('node-mocks-http');
 let clacks = require('../lib/index');
 
-describe('Test init() middleware', () => {
-    test('Getting userId & HttpSessionId from request', () => {
-        let getUserId = jest.fn((req) => {
-            return 'id=' + req.user.id + ':name=' + req.user.name
+describe('Testing index.js', () => {
+    describe('Test init() middleware', () => {
+        test('Getting userId & HttpSessionId from request', () => {
+            let getUserId = jest.fn((req) => {
+                return 'id=' + req.user.id + ':name=' + req.user.name
+            });
+            let getHttpSessionId = jest.fn((req) => {
+                return 'id=' + req.session.id
+            });
+
+            let request = httpMocks.createRequest({
+                session: {
+                    id: 'testSessionId'
+                },
+                user: {
+                    id: 1,
+                    name: 'Test'
+                }
+            });
+
+            let response = httpMocks.createResponse();
+
+            let next = jest.fn(() => {
+                expect(clacks.getUserId()).toBe('id=1:name=Test');
+                expect(clacks.getHttpSessionId()).toBe('id=testSessionId');
+            })
+
+            const middleware = clacks.init({
+                'getUserId': getUserId,
+                'getHttpSessionId': getHttpSessionId
+            });
+            expect(() => middleware(request, response, next)).not.toThrow();
+
+            expect(getUserId).toReturnTimes(1);
+            expect(getHttpSessionId).toReturnTimes(1);
+            expect(next).toReturnTimes(1);
+            expect(clacks.getUserId()).toBe(null);
+            expect(clacks.getHttpSessionId()).toBe(null);
+
+
         });
-        let getHttpSessionId = jest.fn((req) => {
-            return 'id=' + req.session.id
+        test('Getting userId from request', () => {
+            let getUserId = jest.fn((req) => {
+                return 'id=' + req.user.id + ':name=' + req.user.name
+            });
+
+            let request = httpMocks.createRequest({
+                session: {
+                    id: 'testSessionId'
+                },
+                user: {
+                    id: 1,
+                    name: 'Test'
+                }
+            });
+
+            let response = httpMocks.createResponse();
+
+            let next = jest.fn(() => {
+                expect(clacks.getUserId()).toBe('id=1:name=Test');
+                expect(clacks.getHttpSessionId()).toBe('testSessionId');
+            })
+
+            const middleware = clacks.init({
+                getUserId: getUserId
+            });
+            expect(() => middleware(request, response, next)).not.toThrow();
+
+            expect(getUserId).toReturnTimes(1);
+            expect(next).toReturnTimes(1);
+            expect(clacks.getUserId()).toBe(null);
+            expect(clacks.getHttpSessionId()).toBe(null);
+
+
         });
+        test('Getting httpSessionId from request', () => {
+            let getHttpSessionId = jest.fn((req) => {
+                return 'id=' + req.session.id
+            });
 
-        let request = httpMocks.createRequest({
-            session: {
-                id: 'testSessionId'
-            },
-            user: {
-                id: 1,
-                name: 'Test'
-            }
+            let request = httpMocks.createRequest({
+                session: {
+                    id: 'testSessionId'
+                },
+                user: {
+                    id: 1,
+                    name: 'Test'
+                }
+            });
+
+            let response = httpMocks.createResponse();
+
+            let next = jest.fn(() => {
+                expect(clacks.getUserId()).toBe(1);
+                expect(clacks.getHttpSessionId()).toBe('id=testSessionId');
+            })
+
+            const middleware = clacks.init({
+                getHttpSessionId: getHttpSessionId
+            });
+            expect(() => middleware(request, response, next)).not.toThrow();
+
+            expect(getHttpSessionId).toReturnTimes(1);
+            expect(next).toReturnTimes(1);
+            expect(clacks.getUserId()).toBe(null);
+            expect(clacks.getHttpSessionId()).toBe(null);
+
+
         });
+        test('Getting default userId & httpSessionId from request', () => {
 
-        let response = httpMocks.createResponse();
+            const middleware = clacks.init();
 
-        let next = jest.fn(()=> {
-            expect(clacks.getUserId()).toBe('id=1:name=Test');
-            expect(clacks.getHttpSessionId()).toBe('id=testSessionId');
-        })
+            let request = httpMocks.createRequest({
+                session: {
+                    id: 'testSessionId'
+                },
+                user: {
+                    id: 1,
+                    name: 'Test'
+                }
+            });
 
-        const middleware = clacks.init({'getUserId': getUserId, 'getHttpSessionId':getHttpSessionId});
-        expect(() => middleware(request, response, next)).not.toThrow();
+            let response = httpMocks.createResponse();
 
-        expect(getUserId).toReturnTimes(1);
-        expect(getHttpSessionId).toReturnTimes(1);
-        expect(next).toReturnTimes(1);
-        expect(clacks.getUserId()).toBe(null);
-        expect(clacks.getHttpSessionId()).toBe(null);
+            let next = jest.fn(() => {
+                expect(clacks.getUserId()).toBe(1);
+                expect(clacks.getHttpSessionId()).toBe('testSessionId');
+            });
 
+            expect(() => middleware(request, response, next)).not.toThrow();
 
+            expect(next).toReturnTimes(1);
+            expect(clacks.getUserId()).toBe(null);
+            expect(clacks.getHttpSessionId()).toBe(null);
+        });
     });
-    test('Getting userId from request', () => {
-        let getUserId = jest.fn((req) => {
-            return 'id=' + req.user.id + ':name=' + req.user.name
-        });
-
-        let request = httpMocks.createRequest({
-            session: {
-                id: 'testSessionId'
-            },
-            user: {
-                id: 1,
-                name: 'Test'
-            }
-        });
-
-        let response = httpMocks.createResponse();
-
-        let next = jest.fn(()=> {
-            expect(clacks.getUserId()).toBe('id=1:name=Test');
-            expect(clacks.getHttpSessionId()).toBe('testSessionId');
-        })
-
-        const middleware = clacks.init({getUserId: getUserId});
-        expect(() => middleware(request, response, next)).not.toThrow();
-
-        expect(getUserId).toReturnTimes(1);
-        expect(next).toReturnTimes(1);
-        expect(clacks.getUserId()).toBe(null);
-        expect(clacks.getHttpSessionId()).toBe(null);
-
-
-    });
-    test('Getting httpSessionId from request', () => {
-        let getHttpSessionId = jest.fn((req) => {
-            return 'id=' + req.session.id
-        });
-
-        let request = httpMocks.createRequest({
-            session: {
-                id: 'testSessionId'
-            },
-            user: {
-                id: 1,
-                name: 'Test'
-            }
-        });
-
-        let response = httpMocks.createResponse();
-
-        let next = jest.fn(()=> {
-            expect(clacks.getUserId()).toBe(1);
-            expect(clacks.getHttpSessionId()).toBe('id=testSessionId');
-        })
-
-        const middleware = clacks.init({getHttpSessionId: getHttpSessionId});
-        expect(() => middleware(request, response, next)).not.toThrow();
-
-        expect(getHttpSessionId).toReturnTimes(1);
-        expect(next).toReturnTimes(1);
-        expect(clacks.getUserId()).toBe(null);
-        expect(clacks.getHttpSessionId()).toBe(null);
-
-
-    });
-    test('Getting default userId & httpSessionId from request', () => {
-    
-        const middleware = clacks.init();
-
-        let request = httpMocks.createRequest({
-            session: { id: 'testSessionId'},
-            user: {
-                id: 1,
-                name: 'Test'
-            }
-        });
-
-        let response = httpMocks.createResponse();
-
-        let next = jest.fn(() => {
-            expect(clacks.getUserId()).toBe(1);
-            expect(clacks.getHttpSessionId()).toBe('testSessionId');
-        });
-
-        expect(() => middleware(request, response, next)).not.toThrow();
-
-        expect(next).toReturnTimes(1);
-        expect(clacks.getUserId()).toBe(null);
-        expect(clacks.getHttpSessionId()).toBe(null);
+    describe('Test send()', () => {
+        
     });
 });
