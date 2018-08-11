@@ -132,7 +132,7 @@ describe('Test RoutingController', () => {
                 };
                 controller.addWebsocket(socket);
 
-                controller.sendToUsername('example', userId);
+                controller.sendToUserId('example', userId);
 
                 expect(socket.send).toReturnTimes(1);
                 expect(socket.send).toHaveReturnedWith('example');
@@ -145,7 +145,7 @@ describe('Test RoutingController', () => {
                 };
                 controller.addWebsocket(socket);
 
-                controller.sendToUsername('example', userId + '1');
+                controller.sendToUserId('example', userId + '1');
 
                 expect(socket.send).not.toBeCalled();
             })
@@ -179,7 +179,7 @@ describe('Test RoutingController', () => {
         });
         describe('sending to All', () => {
             test('sending to different socket', () => {
-                return false;
+                // TODO
             });
         })
     });
