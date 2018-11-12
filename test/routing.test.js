@@ -138,7 +138,32 @@ describe('Test RoutingController', () => {
             expect(controller.removeWebsocket(socket)).toBeTruthy();
             expect(controller.userMap.get(userId)).toBeUndefined();
         });
-        test('Multiple websockets', () => {
+        test('One session, multiple websockets', () => {
+            let controller = new RoutingController(jest.fn((ws) => ws.id), jest.fn((ws) => ws.sessionId))
+            let firstSocket = {
+                id: 'user',
+                sessionId: 1,
+                on: jest.fn(),
+                send: jest.fn(x => x)
+            };
+            let secondSocket = {
+                id: 'user',
+                sessionId: 1,
+                on: jest.fn(),
+                send: jest.fn(x => x)
+            };
+
+            controller.addWebsocket(firstSocket);
+            controller.addWebsocket(secondSocket);
+            expect(controller.removeWebsocket(firstSocket)).toBeTruthy();
+            expect(controller.userMap.get('user')).not.toBeUndefined();
+            expect(controller.userMap.get('user').get(1)).not.toBeUndefined();
+            expect(controller.userMap.get('user').get(1).length).toBe(1);
+            let result = controller.userMap.get('user').get(1)[0];
+            expect(result).not.toBe(firstSocket);
+            expect(result).toBe(secondSocket);
+        });
+        test('Multiple sessions, websockets', () => {
             let controller = new RoutingController(jest.fn((ws) => ws.id), jest.fn((ws) => ws.sessionId))
             let firstSocket = {
                 id: 'user',
@@ -182,6 +207,10 @@ describe('Test RoutingController', () => {
         });
         test('user doesnt have session', () => {
             let result = controller.userHasSession(userId, 'new session id');
+            expect(result).toBeFalsy()
+        });
+        test('user doesnt exist', () => {
+            let result = controller.userHasSession('newUserId', httpSessionId);
             expect(result).toBeFalsy()
         })
     });
