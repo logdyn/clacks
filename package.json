@@ -2,7 +2,7 @@
     "name": "clacks",
     "version": "1.0.0",
     "description": "Message broker to propagate objects throught relevant client sessions",
-    "main": "index.js",
+    "main": "./lib/index.js",
     "jest": {
         "testEnvironment": "node",
         "collectCoverage": true
