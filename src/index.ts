@@ -1,9 +1,11 @@
-import { RoutingController, Socket } from "./routing";
+import RoutingController from "./routing";
+import { Socket, WebsocketServer } from "./socketTypes";
 
 /** @type {RoutingController} routingController */
-let routingController;
+let routingController: RoutingController<any, any>;
 
-let _userId, _httpSessionId = null;
+let currentUserId: any = null;
+let currentHttpSessionId: any = null;
 
 interface InitOptions<R> {
     websocketServer: WebsocketServer;
@@ -19,10 +21,7 @@ interface DefaultSocket<R> extends Socket {
 
 type DefaultRequest<R> = R & { user: { id: any }, session: { id: any } };
 
-interface WebsocketServer {
-    on: (eventName: string, callback: (socket: Socket) => any) => any;
-}
-export function init<R>(options: InitOptions<R>): (req: R, res, next: () => any) => void {
+export function init<R>(options: InitOptions<R>): (req: R, res: any, next: () => any) => void {
 
     // Set default 'getUserId' method if none defined
     // getUserId will only be falsy if undefined
@@ -51,26 +50,26 @@ export function init<R>(options: InitOptions<R>): (req: R, res, next: () => any)
         socket.on("close", () => routingController.removeWebsocket(socket)); // * ws implementation
     });
 
-    return function(req: R, res, next: () => any) {
-        _userId = options.getUserId(req);
-        _httpSessionId = options.getHttpSessionId(req);
+    return (req: R, res, next: () => any) => {
+        currentUserId = options.getUserId(req);
+        currentHttpSessionId = options.getHttpSessionId(req);
         next();
-        _userId = null;
-        _httpSessionId = null;
+        currentUserId = null;
+        currentHttpSessionId = null;
     };
 }
 
-export function send(payload: any, order): void {
+export function send(payload: any, order: any): void {
     // TODO stuff
 }
 
-export function sendUser(payload: any, userId = _userId): void {
+export function sendUser(payload: any, userId = currentUserId): void {
     routingController.sendToUserId(payload, userId);
 }
 
-export function sendSession(payload: any, sessionId = _httpSessionId, userId?: any): void {
-    if (typeof userId === "undefined" && routingController.userHasSession(_userId, sessionId)) {
-        userId = _userId;
+export function sendSession(payload: any, sessionId = currentHttpSessionId, userId?: any): void {
+    if (typeof userId === "undefined" && routingController.userHasSession(currentUserId, sessionId)) {
+        userId = currentUserId;
     }
     routingController.sendToHttpSession(payload, sessionId, userId);
 }

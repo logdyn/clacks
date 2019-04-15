@@ -1,12 +1,6 @@
-/**
- * this is a socket
- */
-export interface Socket {
-    on: (eventName: string, callback: () => any) => any;
-    send: (payload) => any;
-}
+import { Socket } from "./socketTypes";
 
-export class RoutingController<U, H> {
+export default class RoutingController<U, H> {
 
     private readonly getUserId: (socket: Socket) => U;
     private readonly getHttpSessionId: (socket: Socket) => H;
@@ -52,18 +46,18 @@ export class RoutingController<U, H> {
                 this.userMap.delete(userId);
             }
         } else {
-            httpSessionMap.set(httpSessionId, websockets.filter((ws: Socket) => ws != socket));
+            httpSessionMap.set(httpSessionId, websockets.filter((ws: Socket) => ws !== socket));
         }
         return true;
     }
 
     public userHasSession(username: U, httpSessionId: H): boolean {
         const httpSessionMap = this.userMap.get(username);
-        if (typeof httpSessionMap == "undefined") {
+        if (typeof httpSessionMap === "undefined") {
             return false;
         }
         const websockets = httpSessionMap.get(httpSessionId);
-        if (typeof websockets == "undefined" || websockets.length === 0) {
+        if (typeof websockets === "undefined" || websockets.length === 0) {
             return false;
         }
         return true;

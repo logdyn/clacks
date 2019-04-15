@@ -4,6 +4,10 @@
         "tslint:recommended"
     ],
     "jsRules": {},
-    "rules": {},
-    "rulesDirectory": []
+    "rules": {
+        "interface-name": [true, "never-prefix"]
+    },
+    "rulesDirectory": [],
+    "outDir": "./lib",
+    "exclude": ["node_modules", "lib"]
 }
