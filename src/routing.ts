@@ -2,11 +2,11 @@
  * this is a socket
  */
 export interface Socket {
-    on: (eventName: string, callback: () => any) => any,
-    send: (payload) => any
+    on: (eventName: string, callback: () => any) => any;
+    send: (payload) => any;
 }
 
-export class RoutingController<U,H> {
+export class RoutingController<U, H> {
 
     private readonly getUserId: (socket: Socket) => U;
     private readonly getHttpSessionId: (socket: Socket) => H;
@@ -18,34 +18,34 @@ export class RoutingController<U,H> {
         this.getHttpSessionId = getHttpSessionId;
     }
 
-    addWebsocket(socket: Socket): void {
+    public addWebsocket(socket: Socket): void {
 
-        let userId = this.getUserId(socket);
-        let httpSessionId = this.getHttpSessionId(socket);
+        const userId = this.getUserId(socket);
+        const httpSessionId = this.getHttpSessionId(socket);
 
         let httpSessionMap = this.userMap.get(userId);
-        if (typeof httpSessionMap === 'undefined') {
+        if (typeof httpSessionMap === "undefined") {
             httpSessionMap = new Map();
             this.userMap.set(userId, httpSessionMap);
         }
         let websockets = httpSessionMap.get(httpSessionId);
-        if (typeof websockets === 'undefined') {
+        if (typeof websockets === "undefined") {
             websockets = [];
             httpSessionMap.set(httpSessionId, websockets);
         }
         websockets.push(socket);
     }
 
-    removeWebsocket(socket: Socket): boolean {
+    public removeWebsocket(socket: Socket): boolean {
 
-        let userId = this.getUserId(socket);
-        let httpSessionId = this.getHttpSessionId(socket);
+        const userId = this.getUserId(socket);
+        const httpSessionId = this.getHttpSessionId(socket);
 
-        let httpSessionMap = this.userMap.get(userId);
-        if (typeof httpSessionMap === 'undefined') {
+        const httpSessionMap = this.userMap.get(userId);
+        if (typeof httpSessionMap === "undefined") {
             return false;
         }
-        let websockets = httpSessionMap.get(httpSessionId);
+        const websockets = httpSessionMap.get(httpSessionId);
         if (websockets.length === 1 && websockets[0] === socket) {
             httpSessionMap.delete(httpSessionId);
             if (httpSessionMap.size === 0) {
@@ -57,22 +57,22 @@ export class RoutingController<U,H> {
         return true;
     }
 
-    userHasSession(username: U, httpSessionId: H): boolean {
-        let httpSessionMap = this.userMap.get(username);
-        if (typeof httpSessionMap == 'undefined') {
+    public userHasSession(username: U, httpSessionId: H): boolean {
+        const httpSessionMap = this.userMap.get(username);
+        if (typeof httpSessionMap == "undefined") {
             return false;
         }
-        let websockets = httpSessionMap.get(httpSessionId);
-        if (typeof websockets == 'undefined' || websockets.length === 0) {
+        const websockets = httpSessionMap.get(httpSessionId);
+        if (typeof websockets == "undefined" || websockets.length === 0) {
             return false;
         }
         return true;
     }
 
-    sendToUserId(payload: any, username: U): void {
-        let httpSessionMap = this.userMap.get(username);
+    public sendToUserId(payload: any, username: U): void {
+        const httpSessionMap = this.userMap.get(username);
 
-        if (typeof httpSessionMap === 'undefined') {
+        if (typeof httpSessionMap === "undefined") {
             return;
         }
         httpSessionMap.forEach((websockets: Socket[]) => {
@@ -80,9 +80,9 @@ export class RoutingController<U,H> {
         });
     }
 
-    sendToHttpSession(payload: any, httpSessionId: H, username?: U) {
+    public sendToHttpSession(payload: any, httpSessionId: H, username?: U) {
         let wsArray = [];
-        if (typeof username === 'undefined') {
+        if (typeof username === "undefined") {
             this.userMap.forEach((httpMap) => {
                 if (httpMap.has(httpSessionId)) {
                     wsArray.push(httpMap.get(httpSessionId));
@@ -91,13 +91,13 @@ export class RoutingController<U,H> {
         } else {
             wsArray = this.userMap.get(username).get(httpSessionId);
         }
-        wsArray.forEach(ws => ws.send(payload));
+        wsArray.forEach((ws) => ws.send(payload));
     }
 
-    sendToAll(payload: any) {
-        this.userMap.forEach(httpSessionMap => {
-            httpSessionMap.forEach(wsArray => {
-                wsArray.forEach(ws => ws.send(payload));
+    public sendToAll(payload: any) {
+        this.userMap.forEach((httpSessionMap) => {
+            httpSessionMap.forEach((wsArray) => {
+                wsArray.forEach((ws) => ws.send(payload));
             });
         });
     }
