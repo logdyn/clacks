@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "allowJs": false,
+    "target": "es6",
+    "esModuleInterop": false,
+    "inlineSourceMap": true
+  },
+  "include": [
+    "./src/**/*"
+  ]
+}

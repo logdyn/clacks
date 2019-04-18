@@ -1,21 +1,33 @@
 {
     "name": "clacks",
     "version": "1.0.0",
-    "description": "Message broker to propagate objects throught relevant client sessions",
-    "main": "index.js",
-    "jest": {
-        "testEnvironment": "node",
-        "collectCoverage": true
-    },
-    "dependencies": {
-        "ws": "^6.0.0"
-    },
+    "description": "Message broker to propagate objects through relevant client sessions",
+    "main": "./lib/index.js",
     "devDependencies": {
-        "jest": "^23.4.2",
-        "node-mocks-http": "^1.7.0"
+        "@types/jest": "^24.0.11",
+        "@types/node": "^11.13.4",
+        "jest": "^24.7.1",
+        "ts-jest": "^24.0.2",
+        "tslint": "^5.15.0",
+        "typescript": "^3.4.3"
     },
     "scripts": {
-        "test": "jest --detectOpenHandles"
+        "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
+        "compile": "tsc",
+        "pretest": "npm run lint",
+        "test": "jest"
+    },
+    "jest": {
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js"
+        ],
+        "transform": {
+            "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+        },
+        "testRegex": "/__tests__/.*\\.(ts|tsx|js)$",
+        "collectCoverage": true
     },
     "repository": {
         "type": "git",

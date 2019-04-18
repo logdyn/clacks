@@ -1,0 +1,13 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "interface-name": [true, "never-prefix"]
+    },
+    "rulesDirectory": [],
+    "outDir": "./lib",
+    "exclude": ["node_modules", "lib"]
+}
