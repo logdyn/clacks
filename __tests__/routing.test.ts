@@ -11,9 +11,9 @@ describe("Test RoutingController", () => {
 
       const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
 
-      const mockSocket: Socket = {
-        on: jest.fn((eventName, callback) => true),
-        send: jest.fn((payload) => true),
+      const mockSocket: Socket<any> = {
+        on: jest.fn((eventName: string, callback: () => any) => true),
+        send: jest.fn((payload: any) => true),
       };
 
       expect(() => controller.addWebsocket(mockSocket)).not.toThrow();
@@ -28,13 +28,13 @@ describe("Test RoutingController", () => {
       const httpSessionIdFunc = jest.fn((socket) => "httpSessionId");
       const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
 
-      const socket1: Socket = {
-        on: jest.fn((eventName, callback) => true),
-        send: jest.fn((payload) => true),
+      const socket1: Socket<any> = {
+        on: jest.fn((eventName: string, callback: () => any) => true),
+        send: jest.fn((payload: any) => true),
       };
-      const socket2: Socket = {
-        on: jest.fn((eventName, callback) => true),
-        send: jest.fn((payload) => true),
+      const socket2: Socket<any> = {
+        on: jest.fn((eventName: string, callback: () => any) => true),
+        send: jest.fn((payload: any) => true),
       };
 
       controller.addWebsocket(socket1);
@@ -52,9 +52,9 @@ describe("Test RoutingController", () => {
     const userIdFunc = jest.fn((ws) => userId);
     const httpSessionIdFunc = jest.fn((ws) => httpSessionId);
 
-    const mockSocket: Socket = {
-      on: jest.fn((eventName, callback) => true),
-      send: jest.fn((payload) => true),
+    const mockSocket: Socket<any> = {
+      on: jest.fn((eventName: string, callback: () => any) => true),
+      send: jest.fn((payload: any) => true),
     };
 
     it("Single websocket", () => {
@@ -63,26 +63,27 @@ describe("Test RoutingController", () => {
       expect(controller.removeWebsocket(mockSocket)).toBe(true);
       expect(controller.userHasSession(userId, httpSessionId)).toBe(false);
     });
-    // test("One session, multiple websockets", () => {
-    //   const controller = new RoutingController(jest.fn((ws) => ws.id), jest.fn((ws) => ws.sessionId));
-    //   const firstSocket = {
-    //     id: "user",
-    //     on: jest.fn((eventName, callback) => true),
-    //     send: jest.fn((payload) => true),
-    //     sessionId: 1,
-    //   };
-    //   const secondSocket = {
-    //     id: "user",
-    //     on: jest.fn((eventName, callback) => true),
-    //     send: jest.fn((payload) => true),
-    //     sessionId: 1,
-    //   };
+    test("One session, multiple websockets", () => {
+      const getUserId = jest.fn((ws) => ws.id);
+      const getHttpSessionId = jest.fn((ws) => ws.sessionId);
+      const controller = new RoutingController(getUserId, getHttpSessionId);
+      const firstSocket = {
+        id: "user",
+        on: jest.fn((eventName: string, callback: () => any) => true),
+        send: jest.fn((payload: any) => true),
+        sessionId: 1,
+      };
+      const secondSocket = {
+        id: "user",
+        on: jest.fn((eventName: string, callback: () => any) => true),
+        send: jest.fn((payload: any) => true),
+        sessionId: 1,
+      };
 
-    //   controller.addWebsocket(firstSocket);
-    //   controller.addWebsocket(secondSocket);
-    //   expect(controller.removeWebsocket(firstSocket)).toBeTruthy();
-    //   console.log(controller);
-    // });
+      controller.addWebsocket(firstSocket);
+      controller.addWebsocket(secondSocket);
+      expect(controller.removeWebsocket(firstSocket)).toBeTruthy();
+    });
     it("Undefined session map", () => {
       const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
       expect(controller.removeWebsocket(mockSocket)).toBeFalsy();
@@ -94,9 +95,9 @@ describe("Test RoutingController", () => {
     const userIdFunc = jest.fn((ws) => userId);
     const httpSessionIdFunc = jest.fn((ws) => httpSessionId);
     const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
-    const socket: Socket = {
-      on: jest.fn(),
-      send: jest.fn((x) => x),
+    const socket: Socket<any> = {
+      on: jest.fn((eventName: string, callback: () => any) => true),
+      send: jest.fn((payload: any) => true),
     };
     controller.addWebsocket(socket);
 
@@ -121,22 +122,22 @@ describe("Test RoutingController", () => {
     describe("Sending to user", () => {
       it("Sending to same socket", () => {
         const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
-        const socket: Socket = {
-          on: jest.fn(),
-          send: jest.fn((x) => x),
+        const socket: Socket<any> = {
+          on: jest.fn((eventName: string, callback: () => any) => true),
+          send: jest.fn((payload: any) => true),
         };
         controller.addWebsocket(socket);
 
         controller.sendToUserId("example", userId);
 
         expect(socket.send).toReturnTimes(1);
-        expect(socket.send).toHaveReturnedWith("example");
+        expect(socket.send).lastCalledWith("example");
       });
       it("Sending to different socket", () => {
         const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
-        const socket: Socket = {
-          on: jest.fn(),
-          send: jest.fn((x) => x),
+        const socket: Socket<any> = {
+          on: jest.fn((eventName: string, callback: () => any) => true),
+          send: jest.fn((payload: any) => true),
         };
         controller.addWebsocket(socket);
 
@@ -148,35 +149,35 @@ describe("Test RoutingController", () => {
     describe("Sending to Http Session", () => {
       it("Sending to same socket", () => {
         const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
-        const socket: Socket = {
-          on: jest.fn(),
-          send: jest.fn((x) => x),
+        const socket: Socket<any> = {
+          on: jest.fn((eventName: string, callback: () => any) => true),
+          send: jest.fn((payload: any) => true),
         };
         controller.addWebsocket(socket);
 
         controller.sendToHttpSession("example", httpSessionId, userId);
 
         expect(socket.send).toReturnTimes(1);
-        expect(socket.send).toHaveReturnedWith("example");
+        expect(socket.send).lastCalledWith("example");
       });
       it("Sending to same socket, no username", () => {
         const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
-        const socket: Socket = {
-          on: jest.fn(),
-          send: jest.fn((x) => x),
+        const socket: Socket<any> = {
+          on: jest.fn((eventName: string, callback: () => any) => true),
+          send: jest.fn((payload: any) => true),
         };
         controller.addWebsocket(socket);
 
         controller.sendToHttpSession("example", httpSessionId);
 
         expect(socket.send).toReturnTimes(1);
-        expect(socket.send).toHaveReturnedWith("example");
+        expect(socket.send).lastCalledWith("example");
       });
       it("Sending to different socket", () => {
         const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
-        const socket: Socket = {
-          on: jest.fn(),
-          send: jest.fn((x) => x),
+        const socket: Socket<any> = {
+          on: jest.fn((eventName: string, callback: () => any) => true),
+          send: jest.fn((payload: any) => true),
         };
         controller.addWebsocket(socket);
 
@@ -188,13 +189,13 @@ describe("Test RoutingController", () => {
     describe("Sending to all", () => {
       it("Two mock sockets", () => {
         const controller = new RoutingController(userIdFunc, httpSessionIdFunc);
-        const firstSocket: Socket = {
-          on: jest.fn(),
-          send: jest.fn((x) => x),
+        const firstSocket: Socket<any> = {
+          on: jest.fn((eventName: string, callback: () => any) => true),
+          send: jest.fn((payload: any) => true),
         };
-        const secondSocket: Socket = {
-          on: jest.fn(),
-          send: jest.fn((x) => x),
+        const secondSocket: Socket<any> = {
+          on: jest.fn((eventName: string, callback: () => any) => true),
+          send: jest.fn((payload: any) => true),
         };
         controller.addWebsocket(firstSocket);
         controller.addWebsocket(secondSocket);
@@ -202,9 +203,9 @@ describe("Test RoutingController", () => {
         controller.sendToAll("payload");
 
         expect(firstSocket.send).toReturnTimes(1);
-        expect(firstSocket.send).toHaveReturnedWith("payload");
+        expect(firstSocket.send).lastCalledWith("payload");
         expect(secondSocket.send).toReturnTimes(1);
-        expect(secondSocket.send).toHaveReturnedWith("payload");
+        expect(secondSocket.send).lastCalledWith("payload");
       });
     });
   });

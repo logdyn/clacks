@@ -15,7 +15,7 @@
         "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
         "compile": "tsc",
         "pretest": "npm run lint",
-        "test": "jest",
+        "test": "jest"
     },
     "jest": {
         "moduleFileExtensions": [

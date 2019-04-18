@@ -1,18 +1,18 @@
 import { Socket } from "./socketTypes";
 
-export default class RoutingController<U, H> {
+export default class RoutingController<S, U, H> {
 
-    private readonly getUserId: (socket: Socket) => U;
-    private readonly getHttpSessionId: (socket: Socket) => H;
-    private userMap: Map<U, Map<H, Socket[]>>;
+    private readonly getUserId: (socket: Socket<S>) => U;
+    private readonly getHttpSessionId: (socket: Socket<S>) => H;
+    private userMap: Map<U, Map<H, Array<Socket<S>>>>;
 
-    constructor(getUserId: (socket: Socket) => U, getHttpSessionId: (socket: Socket) => H) {
+    constructor(getUserId: (socket: Socket<S>) => U, getHttpSessionId: (socket: Socket<S>) => H) {
         this.userMap = new Map();
         this.getUserId = getUserId;
         this.getHttpSessionId = getHttpSessionId;
     }
 
-    public addWebsocket(socket: Socket): void {
+    public addWebsocket(socket: Socket<S>): void {
 
         const userId = this.getUserId(socket);
         const httpSessionId = this.getHttpSessionId(socket);
@@ -30,7 +30,7 @@ export default class RoutingController<U, H> {
         websockets.push(socket);
     }
 
-    public removeWebsocket(socket: Socket): boolean {
+    public removeWebsocket(socket: Socket<S>): boolean {
 
         const userId = this.getUserId(socket);
         const httpSessionId = this.getHttpSessionId(socket);
@@ -46,7 +46,7 @@ export default class RoutingController<U, H> {
                 this.userMap.delete(userId);
             }
         } else {
-            httpSessionMap.set(httpSessionId, websockets.filter((ws: Socket) => ws !== socket));
+            httpSessionMap.set(httpSessionId, websockets.filter((ws: Socket<S>) => ws !== socket));
         }
         return true;
     }
@@ -69,17 +69,18 @@ export default class RoutingController<U, H> {
         if (typeof httpSessionMap === "undefined") {
             return;
         }
-        httpSessionMap.forEach((websockets: Socket[]) => {
-            websockets.forEach((ws: Socket) => ws.send(payload));
+        httpSessionMap.forEach((websockets: Array<Socket<S>>) => {
+            websockets.forEach((ws: Socket<S>) => ws.send(payload));
         });
     }
 
     public sendToHttpSession(payload: any, httpSessionId: H, username?: U) {
-        let wsArray = [];
+        let wsArray: Array<Socket<S>> = [];
         if (typeof username === "undefined") {
             this.userMap.forEach((httpMap) => {
                 if (httpMap.has(httpSessionId)) {
-                    wsArray.push(httpMap.get(httpSessionId));
+                    // Spread operator for typing purposes
+                    wsArray.push(...httpMap.get(httpSessionId));
                 }
             });
         } else {
