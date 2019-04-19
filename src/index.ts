@@ -13,7 +13,23 @@ type DefaultRequest<R> = R & { user: { id: any }, session: { id: any } };
 
 type DefaultSocket<S, R> = Socket<S & { request: R }>;
 
-export class Clacks<R, S, U, H> {
+/**
+ * Clacks API entry point. A new instance must be constructed, and provided with a configuration object.
+ *
+ * This options object must define the websocket server, and can define methods for getting the following:
+ *
+ * - getUserId(request: R) => U
+ * - getSocketUserId: (socket: Socket<S>) => U
+ * - getHttpSessionId: (request: R) => H
+ * - getSocketHttpSessionId: (socket: Socket<S>) => H
+ *
+ * Where the types R, S, U, H refer to respectively:
+ * - the request object
+ * - the socket object
+ * - the user name/identifier object
+ * - the httpSession ID
+ */
+export default class Clacks<R, S, U, H> {
 
     private readonly controller: RoutingController<S, U, H>;
 
@@ -74,7 +90,7 @@ export class Clacks<R, S, U, H> {
         this.controller.sendToUserId(payload, userId);
     }
 
-    public sendSession(payload: any, sessionId = this.currentHttpSessionId, userId?: any): void {
+    public sendSession(payload: any, sessionId = this.currentHttpSessionId, userId?: U): void {
         if (typeof userId === "undefined" &&
             this.controller.userHasSession(this.currentUserId, sessionId)) {
             userId = this.currentUserId;
